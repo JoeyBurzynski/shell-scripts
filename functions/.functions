@@ -281,12 +281,12 @@ function update () {
 
   # Ensure we're running the latest version of Node Version Manager.
   printWithColor "Checking for NVM (Node Version Manager) updates.."
-    cd "$NVM_DIR" || exit
-    git fetch origin
-    git checkout "$(git describe --abbrev=0 --tags --match "v[0-9]*" origin)"
-
     # shellcheck source=/dev/null
-    . "$(NVM_DIR)/nvm.sh"
+    (
+      cd "$NVM_DIR"
+      git fetch origin
+      git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" origin`
+    ) && \. "$NVM_DIR/nvm.sh"
 
   #################### Ruby ####################
   # Check for Ruby Gem command updates.
@@ -303,6 +303,8 @@ function update () {
 
   #################### Python ####################
   # Check for Python Environment Manager updates.
+  # pyenv: https://github.com/pyenv/pyenv
+  # pyenv ppdate: https://github.com/pyenv/pyenv-update
   printWithColor "Checking for pyenv (Python Environment Manager) updates.."
   pyenv update
 
@@ -311,8 +313,9 @@ function update () {
   pip install -U pip setuptools
   # pip list --outdated | cut -d' ' -f1 | xargs pip install --upgrade
 
-  # Update packages across all installed versions of Python.
-  printWithColor "Updating all installed Python version packages via pip.."
+  # Update all libraries managed by pip in all versions (pyenv plugin).
+  # pyenv pip-update: https://github.com/massongit/pyenv-pip-update
+  printWithColor "Updating all libraries managed by pip in all versions (pyenv plugin).."
   pyenv pip-update
 }
 
